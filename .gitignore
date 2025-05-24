@@ -1,0 +1,55 @@
+# Moteur Flutter
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+.packages
+.last_commit_id
+.metadata
+.idea/
+.vscode/
+
+# Dépendances Node.js (si vous utilisez des outils basés sur Node comme npm/yarn)
+node_modules/
+
+# Build iOS
+ios/Flutter/Generated.xcconfig
+ios/Flutter/Flutter.podspec
+ios/Flutter/Generated.xcconfig
+ios/.symlinks/
+ios/Pods/
+ios/.ios_symbols
+ios/build/
+
+# Build Android
+android/.gradle
+android/local.properties
+android/.idea/
+android/build/
+android/app/build/
+android/app/.cxx/
+android/app/src/main/assets/flutter_assets/
+android/key.properties
+android/keystore.jks
+
+# Build Web
+web/
+build/
+
+# Fichiers de cache générés par Flutter
+.DS_Store # Mac
+Thumbs.db # Windows
+.tmp_dart_tool
+.flutter-plugins-dependencies
+.flutter-plugins
+.flutter-tool-symlinks
+.flutter-build
+.dart_tool/
+
+# Fichiers et dossiers générés par l'IDE
+# Si vous utilisez Android Studio/IntelliJ
+.idea/workspace.xml
+.idea/libraries/
+.idea/modules.xml
+*.iml
+
+# Fichiers générés par pub
