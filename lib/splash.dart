@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:eduria/widget/connexionpage.dart';
 import 'dart:async';
 
 class SplashScreen extends StatefulWidget {
@@ -11,7 +12,11 @@ class _SplashScreenState extends State<SplashScreen> {
   void initState() {
     super.initState();
     Timer(Duration(seconds: 3), () {
-      Navigator.pushReplacementNamed(context, '/home');
+      Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+              builder: (context) =>
+                  Connexion())); // Redirige vers la page de connexion après 3 secondes
     });
   }
 

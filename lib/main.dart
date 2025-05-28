@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:eduria/splash.dart';
+import 'package:flutter_locales/flutter_locales.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Locales.init(
+      ['fr', 'en', 'es', 'al', 'ch', 'pr', 'rs', 'jp', 'kr', 'it', 'ab']);
   runApp(const MyApp());
 }
 
@@ -11,13 +15,24 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Eduria',
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-        useMaterial3: true,
+    return LocaleBuilder(
+      builder: (locale) => MaterialApp(
+        title: 'Eduria',
+        theme: ThemeData(
+          fontFamily: 'Istok',
+          textTheme: const TextTheme(
+            bodyMedium: TextStyle(
+              //color: Color(0xFF3F3A54), // Couleur de texte sombre
+              fontSize: 30,
+            ),
+          ),
+          scaffoldBackgroundColor: const Color(0xFFF4F1FF), // fond clair
+        ),
+        home: SplashScreen(),
+        localizationsDelegates: Locales.delegates,
+        supportedLocales: Locales.supportedLocales,
+        locale: locale,
       ),
-      home: SplashScreen(),
     );
   }
 }
