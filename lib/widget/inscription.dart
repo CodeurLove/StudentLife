@@ -22,7 +22,7 @@ class _InscriptionState extends State<Inscription> {
           key: _formKey,
           child: ListView(
             children: [
-              const SizedBox(height: 60),
+              const SizedBox(height: 40),
               TypeWriter.text(
                 'Create your account',
                 duration: Duration(milliseconds: 100),
@@ -81,6 +81,32 @@ class _InscriptionState extends State<Inscription> {
                   labelText: 'Confirm the password',
                   icon: Icon(
                     Icons.lock,
+                    color: Color(0xFFA079FF),
+                  ),
+                  labelStyle:
+                      TextStyle(fontFamily: 'Istok', color: Colors.grey),
+                  border: UnderlineInputBorder(),
+                ),
+              ),
+              const SizedBox(height: 20),
+              const TextField(
+                decoration: InputDecoration(
+                  labelText: 'old',
+                  icon: Icon(
+                    Icons.calendar_today,
+                    color: Color(0xFFA079FF),
+                  ),
+                  labelStyle:
+                      TextStyle(fontFamily: 'Istok', color: Colors.grey),
+                  border: UnderlineInputBorder(),
+                ),
+              ),
+              const SizedBox(height: 20),
+              const TextField(
+                decoration: InputDecoration(
+                  labelText: 'country',
+                  icon: Icon(
+                    Icons.location_on,
                     color: Color(0xFFA079FF),
                   ),
                   labelStyle:

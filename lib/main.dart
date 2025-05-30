@@ -5,7 +5,8 @@ import 'package:flutter_locales/flutter_locales.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Locales.init(
-      ['fr', 'en', 'es', 'al', 'ch', 'pr', 'rs', 'jp', 'kr', 'it', 'ab']);
+    ['fr', 'en', 'es', 'de', 'it', 'pt', 'zh', 'ja', 'ko', 'ru', 'ar'],
+  );
   runApp(const MyApp());
 }
 

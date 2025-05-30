@@ -1,0 +1,17 @@
+{
+  "home": "  ホーム",
+  "assessments": "  評価",
+  "language": "  言語",
+  "logout": "  ログアウト",
+  "about": "  情報",
+  "ranking": "  ランキング",
+  "welcome": "Eduriaへようこそ",
+  "coursesession": "コースセッション",
+  "exercisesession": "練習セッション",
+  "learnatyourpace": "自分のペースで学びましょう",
+  "importcourse": "コースをインポートすると、AIが段階的に説明します。",
+  "testknowledge": "知識をテストする",
+  "receiveexercises": "パーソナライズされた修正済みの演習を受け取る。",
+  "createsession": "新しいセッションを作成する",
+  "languages": "すべての言語"
+}

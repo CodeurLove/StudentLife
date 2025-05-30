@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:sidebarx/sidebarx.dart';
 import 'package:eduria/application/langue.dart';
+import 'package:flutter_locales/flutter_locales.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -20,6 +21,8 @@ class _HomePageState extends State<HomePage>
   final Color backgroundColor = const Color(0xFFF5F2FF);
   final Color textColor = const Color(0xFF3F3A54);
 
+  int _lastSelectedIndex = 0;
+
   @override
   void initState() {
     super.initState();
@@ -27,15 +30,23 @@ class _HomePageState extends State<HomePage>
 
     _sidebarController.addListener(() {
       final index = _sidebarController.selectedIndex;
+
+      if (index == _lastSelectedIndex) return;
+      _lastSelectedIndex = index;
+
       if (index < 2) {
         _tabController.animateTo(index);
       } else if (index == 2) {
-        // Action paramètres
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => const LanguageSettingsPage()),
+        ).then((_) {
+          // Quand on revient depuis la page Langue, on remet l’index visuel sur la bonne tab
+          _sidebarController.selectIndex(_tabController.index);
+          _lastSelectedIndex = _tabController.index;
+        });
       } else if (index == 3) {
-        // Action déconnexion
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Déconnexion...')),
-        );
+        // TODO: Add logout logic
       }
     });
   }
@@ -56,7 +67,7 @@ class _HomePageState extends State<HomePage>
         theme: SidebarXTheme(
           margin: const EdgeInsets.all(12),
           decoration: BoxDecoration(
-            color: const Color(0xFFA079FF),
+            color: primaryColor,
             borderRadius: BorderRadius.circular(16),
           ),
           textStyle: GoogleFonts.poppins(
@@ -77,62 +88,42 @@ class _HomePageState extends State<HomePage>
           itemPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
         ),
         extendedTheme: const SidebarXTheme(width: 220),
-        headerBuilder: (context, extended) {
-          return Padding(
-            padding: const EdgeInsets.all(38.0),
-          );
-        },
+        headerBuilder: (context, extended) => const SizedBox(height: 100),
         footerBuilder: (context, extended) => const Padding(
           padding: EdgeInsets.all(12.0),
-          child: Text(
-            '© Eduria',
-            style: TextStyle(color: Colors.white38, fontSize: 11),
-          ),
+          child: Text('© Eduria',
+              style: TextStyle(color: Colors.white38, fontSize: 11)),
         ),
         items: [
           SidebarXItem(
             icon: Icons.home,
-            label: '  Home',
-            onTap: () {
-              _sidebarController.selectIndex(0);
-            },
+            label: Locales.string(context, 'home'),
           ),
           SidebarXItem(
             icon: Icons.school,
-            label: '  assessments',
-            onTap: () {
-              _sidebarController.selectIndex(1);
-            },
+            label: Locales.string(context, 'assessments'),
           ),
           SidebarXItem(
             icon: Icons.translate,
-            label: '  Language',
-            onTap: () {
-              Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => LanguageSettingsPage(),
-                  ));
-              //changeLanguage(context);
-            },
+            label: Locales.string(context, 'language'),
           ),
           SidebarXItem(
             icon: Icons.logout,
-            label: '  disconnects',
+            label: Locales.string(context, 'logout'),
           ),
           SidebarXItem(
-            icon: Icons.info,
-            label: '  About',
-          ),
-          SidebarXItem(icon: Icons.leaderboard, label: '  ranking'),
+              icon: Icons.info, label: Locales.string(context, 'about')),
+          SidebarXItem(
+              icon: Icons.leaderboard,
+              label: Locales.string(context, 'ranking')),
         ],
       ),
       appBar: AppBar(
         automaticallyImplyLeading: true,
         backgroundColor: backgroundColor,
         elevation: 0,
-        title: Text(
-          'Welcome to Eduria',
+        title: LocaleText(
+          'welcome',
           style: GoogleFonts.istokWeb(
             fontSize: 22,
             color: textColor,
@@ -144,9 +135,13 @@ class _HomePageState extends State<HomePage>
           labelColor: primaryColor,
           unselectedLabelColor: textColor,
           indicatorColor: primaryColor,
-          tabs: const [
-            Tab(icon: Icon(Icons.menu_book), text: 'Course session'),
-            Tab(icon: Icon(Icons.edit_note), text: 'Exercise session'),
+          tabs: [
+            Tab(
+                icon: const Icon(Icons.menu_book),
+                child: Text(Locales.string(context, 'coursesession'))),
+            const Tab(
+                icon: Icon(Icons.edit_note),
+                child: LocaleText('exercisesession')),
           ],
         ),
       ),
@@ -155,33 +150,108 @@ class _HomePageState extends State<HomePage>
         children: [
           _buildTabContent(
             icon: Icons.menu_book,
-            title: 'Learn at your own pace',
-            subtitle:
-                'Import a course and the AI will explain it step by step.',
+            title: Locales.string(context, 'learnatyourpace'),
+            subtitle: Locales.string(context, 'importCourse'),
           ),
           _buildTabContent(
             icon: Icons.edit_note,
-            title: 'Test your knowledge',
-            subtitle: 'Receive tailored and corrected exercises.',
+            title: Locales.string(context, 'testknowledge'),
+            subtitle: Locales.string(context, 'receiveexercises'),
           ),
         ],
       ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () {
-          // Action de création de séance
+          final _formKey = GlobalKey<FormState>();
+          final TextEditingController _nameController = TextEditingController();
+          final TextEditingController _descriptionController =
+              TextEditingController();
+
+          showDialog(
+            context: context,
+            builder: (BuildContext context) {
+              return AlertDialog(
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(16)),
+                title: Center(
+                  child: Text(
+                    Locales.string(context, 'createsession'),
+                    style: GoogleFonts.poppins(fontWeight: FontWeight.bold),
+                  ),
+                ),
+                content: Form(
+                  key: _formKey,
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      TextFormField(
+                        controller: _nameController,
+                        decoration: InputDecoration(
+                          prefixIcon: const Icon(Icons.title),
+                          labelText: Locales.string(context, 'sessionname'),
+                          border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(10)),
+                        ),
+                        validator: (value) => value == null || value.isEmpty
+                            ? 'Ce champ est requis'
+                            : null,
+                      ),
+                      const SizedBox(height: 15),
+                      TextFormField(
+                        controller: _descriptionController,
+                        maxLines: 3,
+                        decoration: InputDecoration(
+                          prefixIcon: const Icon(Icons.description),
+                          labelText:
+                              Locales.string(context, 'sessiondescription'),
+                          border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(10)),
+                        ),
+                        validator: (value) => value == null || value.isEmpty
+                            ? 'Ce champ est requis'
+                            : null,
+                      ),
+                      const SizedBox(height: 25),
+                      Align(
+                        alignment: Alignment.centerRight,
+                        child: ElevatedButton.icon(
+                          onPressed: () {
+                            if (_formKey.currentState!.validate()) {
+                              // Traitement à ajouter ici
+                              Navigator.pop(context);
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(content: Text('Séance créée !')),
+                              );
+                            }
+                          },
+                          icon: const Icon(Icons.check),
+                          label: LocaleText('startsession'),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: const Color(0xFFA079FF),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            },
+          );
         },
-        label: const Text('Create a new session'),
+        label: LocaleText('createsession'),
         icon: const Icon(Icons.add),
         backgroundColor: primaryColor,
       ),
     );
   }
 
-  Widget _buildTabContent({
-    required IconData icon,
-    required String title,
-    required String subtitle,
-  }) {
+  Widget _buildTabContent(
+      {required IconData icon,
+      required String title,
+      required String subtitle}) {
     return Center(
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 30.0),
@@ -202,10 +272,7 @@ class _HomePageState extends State<HomePage>
             const SizedBox(height: 12),
             Text(
               subtitle,
-              style: GoogleFonts.istokWeb(
-                fontSize: 16,
-                color: Colors.black54,
-              ),
+              style: GoogleFonts.istokWeb(fontSize: 16, color: Colors.black54),
               textAlign: TextAlign.center,
             ),
           ],

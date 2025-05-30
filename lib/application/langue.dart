@@ -1,67 +1,28 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_locales/flutter_locales.dart';
 
-class LanguageSettingsPage extends StatefulWidget {
+class LanguageSettingsPage extends StatelessWidget {
   const LanguageSettingsPage({Key? key}) : super(key: key);
 
-  @override
-  State<LanguageSettingsPage> createState() => _LanguageSettingsPageState();
-}
-
-class _LanguageSettingsPageState extends State<LanguageSettingsPage> {
-  final List<Map<String, String>> languages = [
-    {
-      'name': 'Français',
-      'native': 'Français',
-    },
-    {
-      'name': 'English',
-      'native': 'English',
-    },
-    {
-      'name': 'Español',
-      'native': 'Español',
-    },
-    {
-      'name': 'Deutsch',
-      'native': 'Deutsch',
-    },
-    {
-      'name': 'Italiano',
-      'native': 'Italiano',
-    },
-    {
-      'name': 'Português',
-      'native': 'Português',
-    },
-    {
-      'name': '中文 (Chinese)',
-      'native': '中文 (Chinese)',
-    },
-    {
-      'name': '日本語 (Japanese)',
-      'native': '日本語 (Japanese)',
-    },
-    {
-      'name': '한국어 (Korean)',
-      'native': '한국어 (Korean)',
-    },
-    {
-      'name': 'Русский (Russian)',
-      'native': 'Русский (Russian)',
-    },
-    {
-      'name': 'العربية (Arabic)',
-      'native': 'العربية (Arabic)',
-    },
-
-    // Ajoute toutes les autres langues ici...
+  final List<Map<String, String>> languages = const [
+    {'name': 'Français', 'code': 'fr'},
+    {'name': 'English', 'code': 'en'},
+    {'name': 'Español', 'code': 'es'},
+    {'name': 'Deutsch', 'code': 'de'},
+    {'name': 'Italiano', 'code': 'it'},
+    {'name': 'Português', 'code': 'pt'},
+    {'name': '中文 (Chinese)', 'code': 'zh'},
+    {'name': '日本語 (Japanese)', 'code': 'ja'},
+    {'name': '한국어 (Korean)', 'code': 'ko'},
+    {'name': 'Русский (Russian)', 'code': 'ru'},
+    {'name': 'العربية (Arabic)', 'code': 'ar'},
   ];
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('All languages'),
+        title: const LocaleText('languages'),
         backgroundColor: Colors.white,
         elevation: 1,
         foregroundColor: Colors.black,
@@ -81,18 +42,11 @@ class _LanguageSettingsPageState extends State<LanguageSettingsPage> {
                 fontSize: 16,
               ),
             ),
-            subtitle: Text(
-              lang['native']!,
-              style: const TextStyle(
-                color: Colors.black54,
-                fontSize: 13,
-              ),
-            ),
-            onTap: () {
-              // Action quand on sélectionne une langue
+            onTap: () async {
+              await Locales.change(context, lang['code']!);
+              Navigator.pop(context);
             },
             contentPadding: const EdgeInsets.symmetric(horizontal: 20),
-            //trailing: const Icon(Icons.arrow_forward_ios, size: 16),
           );
         },
       ),

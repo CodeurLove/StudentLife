@@ -1,0 +1,17 @@
+{
+  "home": "  홈",
+  "assessments": "  평가",
+  "language": "  언어",
+  "logout": "  로그아웃",
+  "about": "  정보",
+  "ranking": "  순위",
+  "welcome": "Eduria에 오신 것을 환영합니다",
+  "coursesession": "강의 세션",
+  "exercisesession": "연습 세션",
+  "learnatyourpace": "자신의 속도로 학습하세요",
+  "importcourse": "강의를 가져오면 AI가 단계별로 설명해줍니다.",
+  "testknowledge": "지식을 테스트하세요",
+  "receiveexercises": "맞춤형 수정 연습을 받으세요.",
+  "createsession": "새 세션 만들기",
+  "languages": "모든 언어"
+}
