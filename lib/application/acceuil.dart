@@ -3,6 +3,7 @@ import 'package:google_fonts/google_fonts.dart'; // Import pour utiliser des pol
 import 'package:sidebarx/sidebarx.dart'; // Import du package SidebarX pour la barre latérale
 import 'package:eduria/application/langue.dart'; // Import de la page de paramètres de langue
 import 'package:flutter_locales/flutter_locales.dart'; // Import pour la gestion des langues/locales
+import 'package:eduria/widget/propos.dart'; // Import de la page "À propos"
 
 // Déclaration du widget principal de la page d'accueil
 class HomePage extends StatefulWidget {
@@ -61,7 +62,16 @@ class _HomePageState extends State<HomePage>
           _lastSelectedIndex = _tabController.index;
         });
       } else if (index == 3) {
-        // TODO: Ajouter la logique de déconnexion ici
+      } else if (index == 4) {
+        // Si l'index est 4, on ouvre la page "À propos"
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => const aboutPage()),
+        ).then((_) {
+          // Quand on revient, on remet la sélection sur l'onglet courant
+          _sidebarController.selectIndex(_tabController.index);
+          _lastSelectedIndex = _tabController.index;
+        });
       }
     });
   }
