@@ -70,6 +70,8 @@ flutter:
     - assets/eduria.png
     - assets/UCAO.png
     - assets/locales/
+    - assets/google.png
+    - assets/vector.png
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images

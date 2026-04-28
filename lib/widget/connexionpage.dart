@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:eduria/widget/inscription.dart';
 
 void main() => runApp(const connexion());
 
@@ -28,9 +29,9 @@ class _LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
     // Couleurs personnalisées basées sur l'image
-    const Color bgColor = Color(0xFFF9F3FF); // Fond lavande très clair
+    const Color bgColor = Color(0xFFFFF3FE); // Fond lavande très clair
     const Color buttonColor = Color(0xFF8B2323); // Rouge bordeaux
-    const Color inputBorderColor = Color(0xFFC5B4E3);
+    const Color inputBorderColor = Color.fromARGB(178, 45, 58, 141);
 
     return Scaffold(
       backgroundColor: bgColor,
@@ -49,7 +50,7 @@ class _LoginPageState extends State<LoginPage> {
             ),
             const SizedBox(height: 30),
             const Text(
-              'Se Connecter',
+              'Connexion',
               style: TextStyle(
                 fontFamily: 'jura',
                 fontSize: 28,
@@ -64,7 +65,9 @@ class _LoginPageState extends State<LoginPage> {
               decoration: InputDecoration(
                 hintText: 'Email',
                 hintStyle: const TextStyle(
-                    fontFamily: 'jura', color: Color(0xFF9E9E9E)),
+                  fontFamily: 'jura',
+                  color: Color.fromARGB(115, 45, 58, 141),
+                ),
                 filled: true,
                 fillColor: Colors.white,
                 contentPadding:
@@ -87,7 +90,7 @@ class _LoginPageState extends State<LoginPage> {
                 hintText: 'Password',
                 hintStyle: const TextStyle(
                   fontFamily: 'jura',
-                  color: Color(0xFF9E9E9E),
+                  color: Color.fromARGB(115, 45, 58, 141),
                 ),
                 filled: true,
                 fillColor: Colors.white,
@@ -162,7 +165,7 @@ class _LoginPageState extends State<LoginPage> {
                 ),
               ],
             ),
-            const SizedBox(height: 40),
+            const SizedBox(height: 20),
             // Sign Up Text
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -170,14 +173,30 @@ class _LoginPageState extends State<LoginPage> {
                 const Text("You Don't Have An Account? ",
                     style: TextStyle(
                         color: Color(0xFF3B448F), fontFamily: 'jura')),
-                GestureDetector(
-                  onTap: () {},
+                TextButton(
+                  onPressed: () {
+                    //page d'inscription
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => const RegisterPage()),
+                    );
+                    // Navigation vers la page d'inscription
+                  },
+                  style: TextButton.styleFrom(
+                    padding: EdgeInsets
+                        .zero, // On enlève le padding interne pour coller au texte
+                    minimumSize: const Size(0, 0),
+                    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                  ),
                   child: const Text(
                     "Sign Up",
                     style: TextStyle(
-                        color: Color(0xFFB04C4C),
-                        fontWeight: FontWeight.bold,
-                        fontFamily: 'jura'),
+                      fontFamily: 'jura',
+                      fontWeight: FontWeight.bold,
+                      color: Color(0xFFB04C4C), // Ton rouge/brun
+                      fontSize: 14,
+                    ),
                   ),
                 ),
               ],

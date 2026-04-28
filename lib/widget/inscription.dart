@@ -1,174 +1,193 @@
-import 'package:flutter/material.dart'; // Import du package Flutter pour l'UI
-import 'package:typewritertext/typewritertext.dart'; // Import pour l'effet machine à écrire
-import 'package:eduria/widget/confirmation.dart'; // Import de la page de confirmation
+import 'package:flutter/material.dart';
 
-// Déclaration du widget d'inscription (formulaire)
-class Inscription extends StatefulWidget {
-  const Inscription({Key? key}) : super(key: key); // Constructeur
+class RegisterPage extends StatefulWidget {
+  const RegisterPage({super.key});
 
   @override
-  _InscriptionState createState() =>
-      _InscriptionState(); // Création de l'état associé
+  State<RegisterPage> createState() => _RegisterPageState();
 }
 
-// Classe d'état pour Inscription
-class _InscriptionState extends State<Inscription> {
-  final _formKey =
-      GlobalKey<FormState>(); // Clé pour gérer l'état du formulaire
+class _RegisterPageState extends State<RegisterPage> {
+  bool _obscurePass = true;
+  bool _obscureConfirm = true;
+
+  // Couleurs et Styles
+  final Color burgundy = const Color(0xFF8B2323);
+  final Color darkBlue = const Color(0xFF3B448F);
+  final Color lavenderBg = const Color(0xFFFFF3FE);
+  final Color borderColor = const Color.fromARGB(178, 45, 58, 141);
+  final TextStyle juraBold =
+      const TextStyle(fontFamily: 'Jura', fontWeight: FontWeight.bold);
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF4F1FF), // Couleur de fond de la page
-      body: Padding(
-        padding:
-            const EdgeInsets.all(30.0), // Marge intérieure autour du formulaire
-        child: Form(
-          key: _formKey, // Clé du formulaire pour la validation
-          child: ListView(
+      backgroundColor: lavenderBg,
+      appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        leading: IconButton(
+          onPressed: () => Navigator.pop(context),
+          icon: const Icon(Icons.arrow_back_ios, color: Colors.grey),
+        ),
+        actions: [
+          Padding(
+            padding: const EdgeInsets.only(right: 10),
+            child: Image.asset('assets/UCAO.png', height: 40),
+          ),
+        ],
+      ),
+      body: SafeArea(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.symmetric(horizontal: 30),
+          child: Column(
             children: [
-              const SizedBox(height: 40), // Espace en haut
-              TypeWriter.text(
-                'Create your account', // Titre avec effet machine à écrire
-                duration: Duration(milliseconds: 100), // Vitesse de l'effet
-                style: TextStyle(
-                  fontSize: 28, // Taille du texte
-                  fontWeight: FontWeight.bold, // Texte en gras
-                  color: Color(0xFF3F3A54), // Couleur du texte
-                ),
-              ),
-              const SizedBox(height: 70), // Espace sous le titre
-              const TextField(
-                // Champ pour le nom d'utilisateur
-                decoration: InputDecoration(
-                  labelText: 'Username', // Label du champ
-                  icon: Icon(
-                    Icons.person, // Icône utilisateur
-                    color: Color(0xFFA079FF), // Couleur de l'icône
-                  ),
-                  labelStyle: TextStyle(
-                    fontFamily: 'Istok', // Police du label
-                    color: Colors.grey, // Couleur du label
-                  ),
-                  border: UnderlineInputBorder(), // Bordure du champ
-                ),
-              ),
-              const SizedBox(height: 20), // Espace entre les champs
-              const TextField(
-                // Champ pour l'email
-                decoration: InputDecoration(
-                  labelText: 'Email', // Label du champ
-                  icon: Icon(
-                    Icons.email, // Icône email
-                    color: Color(0xFFA079FF),
-                  ),
-                  labelStyle:
-                      TextStyle(fontFamily: 'Istok', color: Colors.grey),
-                  border: UnderlineInputBorder(),
-                ),
-              ),
+              // Header : Bouton Retour + Logo à droite
               const SizedBox(height: 20),
-              const TextField(
-                obscureText: true, // Cache le texte (mot de passe)
-                decoration: InputDecoration(
-                  labelText: 'password', // Label du champ
-                  icon: Icon(
-                    Icons.lock, // Icône cadenas
-                    color: Color(0xFFA079FF),
-                  ),
-                  labelStyle:
-                      TextStyle(fontFamily: 'Istok', color: Colors.grey),
-                  border: UnderlineInputBorder(),
-                ),
+              Text(
+                "S'enregistrer",
+                style: juraBold.copyWith(fontSize: 32, color: darkBlue),
               ),
-              const SizedBox(height: 20),
-              const TextField(
-                obscureText: true, // Cache le texte (confirmation mot de passe)
-                decoration: InputDecoration(
-                  labelText: 'Confirm the password', // Label du champ
-                  icon: Icon(
-                    Icons.lock, // Icône cadenas
-                    color: Color(0xFFA079FF),
-                  ),
-                  labelStyle:
-                      TextStyle(fontFamily: 'Istok', color: Colors.grey),
-                  border: UnderlineInputBorder(),
-                ),
-              ),
-              const SizedBox(height: 20),
-              const TextField(
-                // Champ pour l'âge
-                decoration: InputDecoration(
-                  labelText: 'old', // Label du champ
-                  icon: Icon(
-                    Icons.calendar_today, // Icône calendrier
-                    color: Color(0xFFA079FF),
-                  ),
-                  labelStyle:
-                      TextStyle(fontFamily: 'Istok', color: Colors.grey),
-                  border: UnderlineInputBorder(),
-                ),
-              ),
-              const SizedBox(height: 20),
-              const TextField(
-                // Champ pour le pays
-                decoration: InputDecoration(
-                  labelText: 'country', // Label du champ
-                  icon: Icon(
-                    Icons.location_on, // Icône localisation
-                    color: Color(0xFFA079FF),
-                  ),
-                  labelStyle:
-                      TextStyle(fontFamily: 'Istok', color: Colors.grey),
-                  border: UnderlineInputBorder(),
-                ),
-              ),
-              const SizedBox(height: 30), // Espace avant le bouton
+
+              const SizedBox(height: 40),
+
+              // Liste des champs
+              _buildField(hint: "Firstname"),
+              const SizedBox(height: 15),
+              _buildField(hint: "Email"),
+              const SizedBox(height: 15),
+              _buildField(
+                  hint: "Password",
+                  isPass: true,
+                  obscure: _obscurePass,
+                  onToggle: () => setState(() => _obscurePass = !_obscurePass)),
+              const SizedBox(height: 15),
+              _buildField(
+                  hint: "Confirm Password",
+                  isPass: true,
+                  obscure: _obscureConfirm,
+                  onToggle: () =>
+                      setState(() => _obscureConfirm = !_obscureConfirm)),
+              const SizedBox(height: 15),
+              _buildField(hint: ""), // Le champ vide du bas
+
+              const SizedBox(height: 40),
+
+              // Bouton S'enregistrer
               SizedBox(
-                width: double.infinity, // Le bouton prend toute la largeur
+                width: double.infinity,
+                height: 60,
                 child: ElevatedButton(
-                  onPressed: () {
-                    // Action lors du clic sur le bouton
-                    Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) =>
-                              const ConfirmationPage(), // Redirige vers la page de confirmation
-                        ));
-                  },
+                  onPressed: () {},
                   style: ElevatedButton.styleFrom(
-                    backgroundColor:
-                        const Color(0xFFA079FF), // Couleur du bouton
-                    padding: const EdgeInsets.symmetric(
-                        vertical: 15), // Padding vertical
+                    backgroundColor: burgundy,
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8), // Coins arrondis
-                    ),
+                        borderRadius: BorderRadius.circular(30)),
                   ),
-                  child: const Text(
-                    'register', // Texte du bouton
-                    style: TextStyle(
-                      fontSize: 18, // Taille du texte
-                      color: Color(0xFF3F3A54), // couleur du texte
-                    ),
-                  ),
+                  child: Text("S'enregistrer",
+                      style:
+                          juraBold.copyWith(fontSize: 20, color: Colors.white)),
                 ),
               ),
-              const SizedBox(height: 20), // Espace sous le bouton
-              TextButton(
-                onPressed: () {
-                  // rediriger vers page de connexion (à compléter)
-                },
-                child: const Text(
-                  'already have an account ? Log in', // Texte du lien
-                  style:
-                      TextStyle(color: Color(0xFFA079FF)), // Couleur du texte
-                ),
-              )
+
+              const SizedBox(height: 25),
+              _buildDivider(),
+              const SizedBox(height: 25),
+
+              // Social Icons
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  IconButton(
+                      onPressed: () {},
+                      icon: Image.asset('assets/google.png', height: 35)),
+                  const SizedBox(width: 30),
+                  IconButton(
+                      onPressed: () {},
+                      icon: Image.asset('assets/vector.png', height: 40)),
+                ],
+              ),
+
+              const SizedBox(height: 30),
+
+              // Footer Sign In
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text("Do You Have An Account? ",
+                      style: juraBold.copyWith(
+                          color: darkBlue,
+                          fontWeight: FontWeight.normal,
+                          fontSize: 13)),
+                  TextButton(
+                    onPressed: () => Navigator.pop(context),
+                    style: TextButton.styleFrom(
+                        padding: EdgeInsets.zero,
+                        minimumSize: const Size(0, 0)),
+                    child: Text("Sign In",
+                        style: juraBold.copyWith(
+                            color: const Color(0xFFB04C4C), fontSize: 13)),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 20),
             ],
           ),
         ),
       ),
+    );
+  }
+
+  // Widget Helper pour les champs de saisie
+  Widget _buildField(
+      {required String hint,
+      bool isPass = false,
+      bool obscure = false,
+      VoidCallback? onToggle}) {
+    return TextField(
+      obscureText: isPass ? obscure : false,
+      style: juraBold.copyWith(fontWeight: FontWeight.normal, color: darkBlue),
+      decoration: InputDecoration(
+        hintText: hint,
+        hintStyle:
+            TextStyle(color: darkBlue.withOpacity(0.4), fontFamily: 'Jura'),
+        filled: true,
+        fillColor: Colors.white,
+        contentPadding:
+            const EdgeInsets.symmetric(horizontal: 25, vertical: 18),
+        suffixIcon: isPass
+            ? IconButton(
+                icon: Icon(
+                    obscure
+                        ? Icons.visibility_off_outlined
+                        : Icons.visibility_outlined,
+                    color: borderColor),
+                onPressed: onToggle,
+              )
+            : null,
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(25),
+          borderSide: BorderSide(color: borderColor),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(25),
+          borderSide: BorderSide(color: burgundy, width: 1.5),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildDivider() {
+    return Row(
+      children: [
+        Expanded(child: Divider(color: borderColor.withOpacity(0.5))),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 10),
+          child: Text("Or",
+              style: TextStyle(color: borderColor, fontFamily: 'Jura')),
+        ),
+        Expanded(child: Divider(color: borderColor.withOpacity(0.5))),
+      ],
     );
   }
 }
