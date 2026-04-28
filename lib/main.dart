@@ -18,16 +18,16 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return LocaleBuilder(
       builder: (locale) => MaterialApp(
-        title: 'Eduria',
+        title: 'StudentLife',
         theme: ThemeData(
-          fontFamily: 'Istok',
+          fontFamily: 'jura',
           textTheme: const TextTheme(
             bodyMedium: TextStyle(
               //color: Color(0xFF3F3A54), // Couleur de texte sombre
               fontSize: 30,
             ),
           ),
-          scaffoldBackgroundColor: const Color(0xFFF4F1FF), // fond clair
+          scaffoldBackgroundColor: const Color(0xFFFFF3FE), // fond clair
         ),
         home: SplashScreen(),
         localizationsDelegates: Locales.delegates,

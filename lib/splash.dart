@@ -16,7 +16,7 @@ class _SplashScreenState extends State<SplashScreen> {
           context,
           MaterialPageRoute(
               builder: (context) =>
-                  Connexion())); // Redirige vers la page de connexion après 3 secondes
+                  connexion())); // Redirige vers la page de connexion après 3 secondes
     });
   }
 
@@ -29,7 +29,7 @@ class _SplashScreenState extends State<SplashScreen> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Image.asset(
-              'assets/eduria.png', // Assurez-vous que le chemin de l'image est correct
+              'assets/UCAO.png', // Assurez-vous que le chemin de l'image est correct
               width: 200, // Ajustez la taille selon vos besoins
               height: 200,
             ),

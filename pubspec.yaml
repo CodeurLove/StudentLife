@@ -68,6 +68,7 @@ flutter:
   # To add assets to your application, add an assets section, like this:
   assets:
     - assets/eduria.png
+    - assets/UCAO.png
     - assets/locales/
 
   # An image asset can refer to one or more resolution-specific "variants", see
@@ -85,6 +86,11 @@ flutter:
     - family: stock
       fonts:
         - asset: assets/Istok_Web (1)/IstokWeb-Regular.ttf
+    
+    - family : jura
+      fonts :
+        #- asset: assets/static/Jura-Regular.ttf
+        - asset: assets/static/Jura-Bold.ttf
   #         style: italic
   #   - family: Trajan Pro
   #     fonts:

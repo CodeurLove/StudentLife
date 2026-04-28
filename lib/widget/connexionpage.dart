@@ -1,111 +1,198 @@
 import 'package:flutter/material.dart';
-import 'package:typewritertext/typewritertext.dart';
-import 'package:eduria/widget/inscription.dart';
 
-class Connexion extends StatefulWidget {
-  const Connexion({Key? key}) : super(key: key);
+void main() => runApp(const connexion());
 
-  @override
-  State<Connexion> createState() => _ConnexionState();
-}
-
-class _ConnexionState extends State<Connexion> {
-  final emailController = TextEditingController();
-  final passwordController = TextEditingController();
+class connexion extends StatelessWidget {
+  const connexion({super.key});
 
   @override
   Widget build(BuildContext context) {
+    return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      theme: ThemeData(primarySwatch: Colors.red),
+      home: const LoginPage(),
+    );
+  }
+}
+
+class LoginPage extends StatefulWidget {
+  const LoginPage({super.key});
+
+  @override
+  State<LoginPage> createState() => _LoginPageState();
+}
+
+class _LoginPageState extends State<LoginPage> {
+  bool _obscureText = true;
+
+  @override
+  Widget build(BuildContext context) {
+    // Couleurs personnalisées basées sur l'image
+    const Color bgColor = Color(0xFFF9F3FF); // Fond lavande très clair
+    const Color buttonColor = Color(0xFF8B2323); // Rouge bordeaux
+    const Color inputBorderColor = Color(0xFFC5B4E3);
+
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F2FF), // Couleur de fond douce
-      body: Center(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: 32),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              TypeWriter.text(
-                "Welcome to Eduria",
-                duration: const Duration(milliseconds: 100),
-                textAlign: TextAlign.center,
-                style: const TextStyle(
-                  fontSize: 32,
-                  fontWeight: FontWeight.bold,
-                  color: Color(0xFF3F3A54),
-                  fontFamily: 'Istok',
+      backgroundColor: bgColor,
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(30.0),
+        child: Column(
+          children: [
+            const SizedBox(height: 70),
+            // Logo (Remplacez par Image.asset('assets/logo.png'))
+            Center(
+              child: Image.asset(
+                'assets/UCAO.png', // Assurez-vous que le chemin de l'image est correct
+                width: 70,
+                height: 70,
+              ),
+            ),
+            const SizedBox(height: 30),
+            const Text(
+              'Se Connecter',
+              style: TextStyle(
+                fontFamily: 'jura',
+                fontSize: 28,
+                fontWeight: FontWeight.bold,
+                color: Color(0xFF3B448F), // Bleu foncé
+                letterSpacing: 1.2,
+              ),
+            ),
+            const SizedBox(height: 40),
+            // Champ Email
+            TextField(
+              decoration: InputDecoration(
+                hintText: 'Email',
+                hintStyle: const TextStyle(
+                    fontFamily: 'jura', color: Color(0xFF9E9E9E)),
+                filled: true,
+                fillColor: Colors.white,
+                contentPadding:
+                    const EdgeInsets.symmetric(vertical: 20, horizontal: 20),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(25),
+                  borderSide: const BorderSide(color: inputBorderColor),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(25),
+                  borderSide: const BorderSide(color: buttonColor, width: 2),
                 ),
               ),
-              const SizedBox(height: 150),
-              TextField(
-                controller: emailController,
-                decoration: InputDecoration(
-                  icon: const Icon(
-                    Icons.email,
-                    color: Color(0xFFA079FF),
-                  ),
-                  labelText: 'Email',
-                  labelStyle: const TextStyle(
-                    color: Colors.grey,
-                    fontSize: 14,
-                    fontFamily: 'Istok',
-                  ),
-                  //filled: true,
-                  //fillColor: Colors.white,
-                  border: UnderlineInputBorder(),
+            ),
+            const SizedBox(height: 20),
+            // Champ Mot de passe
+            TextField(
+              obscureText: _obscureText,
+              decoration: InputDecoration(
+                hintText: 'Password',
+                hintStyle: const TextStyle(
+                  fontFamily: 'jura',
+                  color: Color(0xFF9E9E9E),
+                ),
+                filled: true,
+                fillColor: Colors.white,
+                contentPadding:
+                    const EdgeInsets.symmetric(vertical: 20, horizontal: 20),
+                suffixIcon: IconButton(
+                  icon: Icon(_obscureText
+                      ? Icons.visibility_off_outlined
+                      : Icons.visibility_outlined),
+                  color: const Color(0xFF3B448F),
+                  onPressed: () => setState(() => _obscureText = !_obscureText),
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(25),
+                  borderSide: const BorderSide(color: inputBorderColor),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(25),
+                  borderSide: const BorderSide(color: buttonColor, width: 2),
                 ),
               ),
-              const SizedBox(height: 20),
-              TextField(
-                controller: passwordController,
-                obscureText: true,
-                decoration: InputDecoration(
-                  icon: const Icon(
-                    Icons.lock,
-                    color: Color(0xFFA079FF),
-                  ),
-                  labelText: 'Password',
-                  labelStyle: const TextStyle(
-                    color: Colors.grey,
-                    fontSize: 14,
-                    fontFamily: 'Istok',
-                  ),
-                  border: UnderlineInputBorder(),
-                ),
-              ),
-              const SizedBox(height: 30),
-              ElevatedButton(
-                onPressed: () {
-                  // TODO: Intégrer la logique de connexion
-                },
+            ),
+            const SizedBox(height: 40),
+            // Bouton Se Connecter
+            SizedBox(
+              width: double.infinity,
+              height: 60,
+              child: ElevatedButton(
+                onPressed: () {},
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFFA079FF),
-                  padding: const EdgeInsets.symmetric(vertical: 16),
+                  backgroundColor: buttonColor,
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
+                    borderRadius: BorderRadius.circular(25),
                   ),
                 ),
                 child: const Text(
-                  "Se connecter",
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+                  'Se Connecter',
+                  style: TextStyle(
+                      fontFamily: 'jura',
+                      fontSize: 18,
+                      color: Colors.white,
+                      fontWeight: FontWeight.w600),
                 ),
               ),
-              const SizedBox(height: 12),
-              TextButton(
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => const Inscription()),
-                  );
-                },
-                child: const Text(
-                  "Create an account",
-                  style: TextStyle(color: Color(0xFFA079FF)),
+            ),
+            const SizedBox(height: 30),
+            // Séparateur "Or"
+            const Row(
+              children: [
+                Expanded(child: Divider(thickness: 1, color: inputBorderColor)),
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 10),
+                  child: Text('Or',
+                      style: TextStyle(fontFamily: 'jura', color: Colors.grey)),
                 ),
-              ),
-            ],
-          ),
+                Expanded(child: Divider(thickness: 1, color: inputBorderColor)),
+              ],
+            ),
+            const SizedBox(height: 30),
+            // Social Login
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                IconButton(
+                  onPressed: () {},
+                  icon: Image.asset('assets/google.png', height: 40),
+                ),
+                const SizedBox(width: 40),
+                IconButton(
+                  onPressed: () {},
+                  icon: Image.asset('assets/vector.png', height: 40),
+                ),
+              ],
+            ),
+            const SizedBox(height: 40),
+            // Sign Up Text
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Text("You Don't Have An Account? ",
+                    style: TextStyle(
+                        color: Color(0xFF3B448F), fontFamily: 'jura')),
+                GestureDetector(
+                  onTap: () {},
+                  child: const Text(
+                    "Sign Up",
+                    style: TextStyle(
+                        color: Color(0xFFB04C4C),
+                        fontWeight: FontWeight.bold,
+                        fontFamily: 'jura'),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 20),
+          ],
         ),
       ),
+    );
+  }
+
+  Widget _socialIcon(String url) {
+    return Image.network(
+      'https://www.freepnglogos.com/uploads/google-logo-png/google-logo-png-google-icon-logo-png-transparent-svg-vector-bie-supply-14.png',
+      height: 35,
     );
   }
 }
