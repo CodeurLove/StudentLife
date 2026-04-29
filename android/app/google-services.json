@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "41909711604",
+    "project_id": "studentlife-1b6d7",
+    "storage_bucket": "studentlife-1b6d7.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:41909711604:android:83d52a8df0ac8df7ada4a1",
+        "android_client_info": {
+          "package_name": "com.example.eduria"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDnsQKS36WS9oLQoGqUgfxVg1bZKD24GpE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -36,6 +36,9 @@ dependencies:
   path_provider: ^2.0.0  # ou la dernière version stable
   sidebarx: ^0.3.0
   flutter_locales: ^3.0.4
+  firebase_core: ^3.6.0
+  firebase_auth: ^5.3.1
+  cloud_firestore: ^5.4.4
 
 
   # The following adds the Cupertino Icons font to your application.
