@@ -1,20 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:eduria/widget/inscription.dart';
-
-void main() => runApp(const connexion());
-
-class connexion extends StatelessWidget {
-  const connexion({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      theme: ThemeData(primarySwatch: Colors.red),
-      home: const LoginPage(),
-    );
-  }
-}
+import 'package:eduria/application/HomePage_student.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -25,14 +13,87 @@ class LoginPage extends StatefulWidget {
 
 class _LoginPageState extends State<LoginPage> {
   bool _obscureText = true;
+  bool _isLoading = false;
+
+  final _emailController = TextEditingController();
+  final _passwordController = TextEditingController();
+
+  static const Color bgColor = Color(0xFFFFF3FE);
+  static const Color buttonColor = Color(0xFF8B2323);
+  static const Color darkBlue = Color(0xFF3B448F);
+  static const Color inputBorderColor = Color.fromARGB(178, 45, 58, 141);
+
+  @override
+  void dispose() {
+    _emailController.dispose();
+    _passwordController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _login() async {
+    if (_emailController.text.trim().isEmpty ||
+        _passwordController.text.trim().isEmpty) {
+      _showError("Veuillez remplir tous les champs.");
+      return;
+    }
+
+    setState(() => _isLoading = true);
+
+    try {
+      // Connexion Firebase Auth
+      final credential = await FirebaseAuth.instance.signInWithEmailAndPassword(
+        email: _emailController.text.trim(),
+        password: _passwordController.text.trim(),
+      );
+
+      final uid = credential.user!.uid;
+
+      // Récupérer le rôle dans Firestore
+      final userDoc =
+          await FirebaseFirestore.instance.collection('users').doc(uid).get();
+
+      final role = userDoc.data()?['role'] ?? 'student';
+
+      if (!mounted) return;
+
+      // Redirection selon le rôle
+      if (role == 'student') {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (_) => const StudentHomePage()),
+        );
+      } else if (role == 'club_admin') {
+        // Navigator.pushReplacement(context,
+        //   MaterialPageRoute(builder: (_) => const ClubAdminHomePage()));
+        _showError("Page admin en cours de développement.");
+      } else if (role == 'super_admin') {
+        // Navigator.pushReplacement(context,
+        //   MaterialPageRoute(builder: (_) => const SuperAdminHomePage()));
+        _showError("Page super admin en cours de développement.");
+      }
+    } on FirebaseAuthException catch (e) {
+      String message = "Une erreur est survenue.";
+      if (e.code == 'user-not-found') {
+        message = "Aucun compte trouvé avec cet email.";
+      } else if (e.code == 'wrong-password' || e.code == 'invalid-credential') {
+        message = "Mot de passe incorrect.";
+      } else if (e.code == 'invalid-email') {
+        message = "Adresse email invalide.";
+      }
+      _showError(message);
+    } finally {
+      if (mounted) setState(() => _isLoading = false);
+    }
+  }
+
+  void _showError(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(message), backgroundColor: Colors.red),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
-    // Couleurs personnalisées basées sur l'image
-    const Color bgColor = Color(0xFFFFF3FE); // Fond lavande très clair
-    const Color buttonColor = Color(0xFF8B2323); // Rouge bordeaux
-    const Color inputBorderColor = Color.fromARGB(178, 45, 58, 141);
-
     return Scaffold(
       backgroundColor: bgColor,
       body: SingleChildScrollView(
@@ -40,13 +101,8 @@ class _LoginPageState extends State<LoginPage> {
         child: Column(
           children: [
             const SizedBox(height: 70),
-            // Logo (Remplacez par Image.asset('assets/logo.png'))
             Center(
-              child: Image.asset(
-                'assets/UCAO.png', // Assurez-vous que le chemin de l'image est correct
-                width: 70,
-                height: 70,
-              ),
+              child: Image.asset('assets/UCAO.png', width: 70, height: 70),
             ),
             const SizedBox(height: 30),
             const Text(
@@ -55,13 +111,16 @@ class _LoginPageState extends State<LoginPage> {
                 fontFamily: 'jura',
                 fontSize: 28,
                 fontWeight: FontWeight.bold,
-                color: Color(0xFF3B448F), // Bleu foncé
+                color: Color(0xFF3B448F),
                 letterSpacing: 1.2,
               ),
             ),
             const SizedBox(height: 40),
+
             // Champ Email
             TextField(
+              controller: _emailController,
+              keyboardType: TextInputType.emailAddress,
               decoration: InputDecoration(
                 hintText: 'Email',
                 hintStyle: const TextStyle(
@@ -83,8 +142,10 @@ class _LoginPageState extends State<LoginPage> {
               ),
             ),
             const SizedBox(height: 20),
+
             // Champ Mot de passe
             TextField(
+              controller: _passwordController,
               obscureText: _obscureText,
               decoration: InputDecoration(
                 hintText: 'Password',
@@ -114,30 +175,33 @@ class _LoginPageState extends State<LoginPage> {
               ),
             ),
             const SizedBox(height: 40),
+
             // Bouton Se Connecter
             SizedBox(
               width: double.infinity,
               height: 60,
               child: ElevatedButton(
-                onPressed: () {},
+                onPressed: _isLoading ? null : _login,
                 style: ElevatedButton.styleFrom(
                   backgroundColor: buttonColor,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(25),
                   ),
                 ),
-                child: const Text(
-                  'Se Connecter',
-                  style: TextStyle(
-                      fontFamily: 'jura',
-                      fontSize: 18,
-                      color: Colors.white,
-                      fontWeight: FontWeight.w600),
-                ),
+                child: _isLoading
+                    ? const CircularProgressIndicator(color: Colors.white)
+                    : const Text(
+                        'Se Connecter',
+                        style: TextStyle(
+                            fontFamily: 'jura',
+                            fontSize: 18,
+                            color: Colors.white,
+                            fontWeight: FontWeight.w600),
+                      ),
               ),
             ),
             const SizedBox(height: 30),
-            // Séparateur "Or"
+
             const Row(
               children: [
                 Expanded(child: Divider(thickness: 1, color: inputBorderColor)),
@@ -150,7 +214,7 @@ class _LoginPageState extends State<LoginPage> {
               ],
             ),
             const SizedBox(height: 30),
-            // Social Login
+
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
@@ -166,7 +230,7 @@ class _LoginPageState extends State<LoginPage> {
               ],
             ),
             const SizedBox(height: 20),
-            // Sign Up Text
+
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
@@ -175,17 +239,14 @@ class _LoginPageState extends State<LoginPage> {
                         color: Color(0xFF3B448F), fontFamily: 'jura')),
                 TextButton(
                   onPressed: () {
-                    //page d'inscription
                     Navigator.push(
                       context,
                       MaterialPageRoute(
                           builder: (context) => const RegisterPage()),
                     );
-                    // Navigation vers la page d'inscription
                   },
                   style: TextButton.styleFrom(
-                    padding: EdgeInsets
-                        .zero, // On enlève le padding interne pour coller au texte
+                    padding: EdgeInsets.zero,
                     minimumSize: const Size(0, 0),
                     tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                   ),
@@ -194,7 +255,7 @@ class _LoginPageState extends State<LoginPage> {
                     style: TextStyle(
                       fontFamily: 'jura',
                       fontWeight: FontWeight.bold,
-                      color: Color(0xFFB04C4C), // Ton rouge/brun
+                      color: Color(0xFFB04C4C),
                       fontSize: 14,
                     ),
                   ),

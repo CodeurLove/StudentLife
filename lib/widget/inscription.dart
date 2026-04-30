@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class RegisterPage extends StatefulWidget {
   const RegisterPage({super.key});
@@ -8,8 +10,18 @@ class RegisterPage extends StatefulWidget {
 }
 
 class _RegisterPageState extends State<RegisterPage> {
+  // Controllers
+  final _firstnameController = TextEditingController();
+  final _emailController = TextEditingController();
+  final _passwordController = TextEditingController();
+  final _confirmPasswordController = TextEditingController();
+  final _adminPasswordController = TextEditingController();
+
   bool _obscurePass = true;
   bool _obscureConfirm = true;
+  bool _obscureAdmin = true;
+  bool _isAdmin = false;
+  bool _isLoading = false;
 
   // Couleurs et Styles
   final Color burgundy = const Color(0xFF8B2323);
@@ -18,6 +30,102 @@ class _RegisterPageState extends State<RegisterPage> {
   final Color borderColor = const Color.fromARGB(178, 45, 58, 141);
   final TextStyle juraBold =
       const TextStyle(fontFamily: 'Jura', fontWeight: FontWeight.bold);
+
+  @override
+  void dispose() {
+    _firstnameController.dispose();
+    _emailController.dispose();
+    _passwordController.dispose();
+    _confirmPasswordController.dispose();
+    _adminPasswordController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _register() async {
+    // Vérifications de base
+    if (_firstnameController.text.trim().isEmpty ||
+        _emailController.text.trim().isEmpty ||
+        _passwordController.text.trim().isEmpty) {
+      _showError("Veuillez remplir tous les champs.");
+      return;
+    }
+
+    if (_passwordController.text != _confirmPasswordController.text) {
+      _showError("Les mots de passe ne correspondent pas.");
+      return;
+    }
+
+    // Vérification mot de passe admin
+    if (_isAdmin) {
+      final adminPass = _adminPasswordController.text.trim();
+      if (adminPass.isEmpty) {
+        _showError("Entrez le mot de passe administrateur.");
+        return;
+      }
+
+      // Vérifier dans Firestore si le mot de passe admin est valide
+      final snap = await FirebaseFirestore.instance
+          .collection('adminpassword')
+          .where('passwordHash', isEqualTo: adminPass)
+          .limit(1)
+          .get();
+
+      if (snap.docs.isEmpty) {
+        _showError("Mot de passe administrateur incorrect.");
+        return;
+      }
+    }
+
+    setState(() => _isLoading = true);
+
+    try {
+      // Créer le compte Firebase Auth
+      final credential =
+          await FirebaseAuth.instance.createUserWithEmailAndPassword(
+        email: _emailController.text.trim(),
+        password: _passwordController.text.trim(),
+      );
+
+      final uid = credential.user!.uid;
+
+      // Sauvegarder dans Firestore
+      await FirebaseFirestore.instance.collection('users').doc(uid).set({
+        'uid': uid,
+        'firstname': _firstnameController.text.trim(),
+        'email': _emailController.text.trim(),
+        'role': _isAdmin ? 'club_admin' : 'student',
+        'createdAt': Timestamp.now(),
+      });
+
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text("Compte créé avec succès !"),
+            backgroundColor: Colors.green,
+          ),
+        );
+        Navigator.pop(context);
+      }
+    } on FirebaseAuthException catch (e) {
+      String message = "Une erreur est survenue.";
+      if (e.code == 'email-already-in-use') {
+        message = "Cet email est déjà utilisé.";
+      } else if (e.code == 'weak-password') {
+        message = "Mot de passe trop faible (min. 6 caractères).";
+      } else if (e.code == 'invalid-email') {
+        message = "Adresse email invalide.";
+      }
+      _showError(message);
+    } finally {
+      if (mounted) setState(() => _isLoading = false);
+    }
+  }
+
+  void _showError(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(message), backgroundColor: Colors.red),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -42,34 +150,73 @@ class _RegisterPageState extends State<RegisterPage> {
           padding: const EdgeInsets.symmetric(horizontal: 30),
           child: Column(
             children: [
-              // Header : Bouton Retour + Logo à droite
               const SizedBox(height: 20),
               Text(
                 "S'enregistrer",
                 style: juraBold.copyWith(fontSize: 32, color: darkBlue),
               ),
-
               const SizedBox(height: 40),
 
-              // Liste des champs
-              _buildField(hint: "Firstname"),
+              // Champs
+              _buildField(hint: "Firstname", controller: _firstnameController),
               const SizedBox(height: 15),
-              _buildField(hint: "Email"),
-              const SizedBox(height: 15),
-              _buildField(
-                  hint: "Password",
-                  isPass: true,
-                  obscure: _obscurePass,
-                  onToggle: () => setState(() => _obscurePass = !_obscurePass)),
+              _buildField(hint: "Email", controller: _emailController),
               const SizedBox(height: 15),
               _buildField(
-                  hint: "Confirm Password",
+                hint: "Password",
+                controller: _passwordController,
+                isPass: true,
+                obscure: _obscurePass,
+                onToggle: () => setState(() => _obscurePass = !_obscurePass),
+              ),
+              const SizedBox(height: 15),
+              _buildField(
+                hint: "Confirm Password",
+                controller: _confirmPasswordController,
+                isPass: true,
+                obscure: _obscureConfirm,
+                onToggle: () =>
+                    setState(() => _obscureConfirm = !_obscureConfirm),
+              ),
+              const SizedBox(height: 15),
+
+              // Choix Admin / Étudiant
+              Container(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 25, vertical: 5),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(25),
+                  border: Border.all(color: borderColor),
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text("Je suis administrateur",
+                        style: TextStyle(
+                            fontFamily: 'Jura',
+                            color: darkBlue.withOpacity(0.6))),
+                    Switch(
+                      value: _isAdmin,
+                      activeColor: burgundy,
+                      onChanged: (val) => setState(() => _isAdmin = val),
+                    ),
+                  ],
+                ),
+              ),
+
+              // Champ mot de passe admin (visible seulement si _isAdmin)
+              if (_isAdmin) ...[
+                const SizedBox(height: 15),
+                _buildField(
+                  hint: "Mot de passe administrateur",
+                  controller: _adminPasswordController,
                   isPass: true,
-                  obscure: _obscureConfirm,
+                  obscure: _obscureAdmin,
                   onToggle: () =>
-                      setState(() => _obscureConfirm = !_obscureConfirm)),
-              const SizedBox(height: 15),
-              _buildField(hint: ""), // Le champ vide du bas
+                      setState(() => _obscureAdmin = !_obscureAdmin),
+                ),
+              ],
 
               const SizedBox(height: 40),
 
@@ -78,15 +225,17 @@ class _RegisterPageState extends State<RegisterPage> {
                 width: double.infinity,
                 height: 60,
                 child: ElevatedButton(
-                  onPressed: () {},
+                  onPressed: _isLoading ? null : _register,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: burgundy,
                     shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(30)),
                   ),
-                  child: Text("S'enregistrer",
-                      style:
-                          juraBold.copyWith(fontSize: 20, color: Colors.white)),
+                  child: _isLoading
+                      ? const CircularProgressIndicator(color: Colors.white)
+                      : Text("S'enregistrer",
+                          style: juraBold.copyWith(
+                              fontSize: 20, color: Colors.white)),
                 ),
               ),
 
@@ -94,7 +243,6 @@ class _RegisterPageState extends State<RegisterPage> {
               _buildDivider(),
               const SizedBox(height: 25),
 
-              // Social Icons
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
@@ -110,7 +258,6 @@ class _RegisterPageState extends State<RegisterPage> {
 
               const SizedBox(height: 30),
 
-              // Footer Sign In
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
@@ -138,13 +285,15 @@ class _RegisterPageState extends State<RegisterPage> {
     );
   }
 
-  // Widget Helper pour les champs de saisie
-  Widget _buildField(
-      {required String hint,
-      bool isPass = false,
-      bool obscure = false,
-      VoidCallback? onToggle}) {
+  Widget _buildField({
+    required String hint,
+    required TextEditingController controller,
+    bool isPass = false,
+    bool obscure = false,
+    VoidCallback? onToggle,
+  }) {
     return TextField(
+      controller: controller,
       obscureText: isPass ? obscure : false,
       style: juraBold.copyWith(fontWeight: FontWeight.normal, color: darkBlue),
       decoration: InputDecoration(

@@ -16,7 +16,7 @@ class _SplashScreenState extends State<SplashScreen> {
           context,
           MaterialPageRoute(
               builder: (context) =>
-                  connexion())); // Redirige vers la page de connexion après 3 secondes
+                  LoginPage())); // Redirige vers la page de connexion après 3 secondes
     });
   }
 
