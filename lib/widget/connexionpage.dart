@@ -3,6 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:eduria/widget/inscription.dart';
 import 'package:eduria/application/HomePage_student.dart';
+import 'package:eduria/application/admin_home.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -63,13 +64,10 @@ class _LoginPageState extends State<LoginPage> {
           MaterialPageRoute(builder: (_) => const StudentHomePage()),
         );
       } else if (role == 'club_admin') {
-        // Navigator.pushReplacement(context,
-        //   MaterialPageRoute(builder: (_) => const ClubAdminHomePage()));
-        _showError("Page admin en cours de développement.");
-      } else if (role == 'super_admin') {
-        // Navigator.pushReplacement(context,
-        //   MaterialPageRoute(builder: (_) => const SuperAdminHomePage()));
-        _showError("Page super admin en cours de développement.");
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (_) => const AdminHomePage()),
+        );
       }
     } on FirebaseAuthException catch (e) {
       String message = "Une erreur est survenue.";

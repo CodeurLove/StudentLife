@@ -41,6 +41,8 @@ class _RegisterPageState extends State<RegisterPage> {
     super.dispose();
   }
 
+  String adminClubId = '';
+
   Future<void> _register() async {
     // Vérifications de base
     if (_firstnameController.text.trim().isEmpty ||
@@ -74,6 +76,9 @@ class _RegisterPageState extends State<RegisterPage> {
         _showError("Mot de passe administrateur incorrect.");
         return;
       }
+
+// Récupérer le clubId associé à ce mot de passe
+      adminClubId = snap.docs.first.data()['clubId'] ?? '';
     }
 
     setState(() => _isLoading = true);
@@ -88,14 +93,25 @@ class _RegisterPageState extends State<RegisterPage> {
 
       final uid = credential.user!.uid;
 
-      // Sauvegarder dans Firestore
       await FirebaseFirestore.instance.collection('users').doc(uid).set({
         'uid': uid,
         'firstname': _firstnameController.text.trim(),
         'email': _emailController.text.trim(),
         'role': _isAdmin ? 'club_admin' : 'student',
+        'clubId': adminClubId, // sera vide pour les étudiants
         'createdAt': Timestamp.now(),
       });
+      // Si admin, l'inscrire automatiquement dans son club
+      if (_isAdmin && adminClubId.isNotEmpty) {
+        final docRef =
+            FirebaseFirestore.instance.collection('memberships').doc();
+        await docRef.set({
+          'membershipId': docRef.id,
+          'userId': uid,
+          'clubId': adminClubId,
+          'joinedAt': Timestamp.now(),
+        });
+      }
 
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(

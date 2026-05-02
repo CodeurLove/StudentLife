@@ -26,9 +26,7 @@ class MyApp extends StatelessWidget {
         theme: ThemeData(
           fontFamily: 'jura',
           textTheme: const TextTheme(
-            bodyMedium: TextStyle(
-              fontSize: 30,
-            ),
+            bodyMedium: TextStyle(),
           ),
           scaffoldBackgroundColor: const Color(0xFFFFF3FE),
         ),

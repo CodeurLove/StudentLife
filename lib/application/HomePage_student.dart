@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:eduria/application/clubs_page.dart';
+import 'package:eduria/application/panneau_club.dart';
+import 'package:eduria/application/init_admin_passwords.dart';
 
 class StudentHomePage extends StatefulWidget {
   const StudentHomePage({super.key});
@@ -39,6 +42,7 @@ class _StudentHomePageState extends State<StudentHomePage> {
     _firstname = userDoc.data()?['firstname'] ?? '';
 
     // Charger les clubs de l'étudiant
+// Charger les clubs de l'étudiant
     final memberships = await _db
         .collection('memberships')
         .where('userId', isEqualTo: uid)
@@ -46,16 +50,23 @@ class _StudentHomePageState extends State<StudentHomePage> {
 
     List<Map<String, dynamic>> clubs = [];
     for (var m in memberships.docs) {
-      final clubDoc =
-          await _db.collection('clubs').doc(m.data()['clubId']).get();
-      if (clubDoc.exists) {
-        // Compter les membres du club
+      final memberClubId = m.data()['clubId'];
+
+      // Chercher par le champ clubid (pas l'ID du document)
+      final clubSnap = await _db
+          .collection('clubs')
+          .where('clubid', isEqualTo: memberClubId)
+          .limit(1)
+          .get();
+
+      if (clubSnap.docs.isNotEmpty) {
+        final clubData = clubSnap.docs.first.data();
         final membersSnap = await _db
             .collection('memberships')
-            .where('clubId', isEqualTo: clubDoc.id)
+            .where('clubId', isEqualTo: memberClubId)
             .get();
         clubs.add({
-          ...clubDoc.data()!,
+          ...clubData,
           'memberCount': membersSnap.docs.length,
         });
       }
@@ -114,6 +125,31 @@ class _StudentHomePageState extends State<StudentHomePage> {
     return months[month];
   }
 
+  String _getClubEmoji(String clubId) {
+    const emojis = {
+      'anglais': '🇬🇧',
+      'finances': '💰',
+      'juristes': '⚖️',
+      'communication': '📡',
+      'foot_garcon': '⚽',
+      'foot_fille': '⚽',
+      'arts_martiaux': '🥋',
+      'atletisme': '🏃',
+      'volley': '🏐',
+      'basket': '🏀',
+      'petanque': '🎯',
+      'danse': '💃',
+      'theatre': '🎭',
+      'stylisme': '👗',
+      'orchestre': '🎻',
+      'musique': '🎵',
+      'cartes': '🃏',
+      'echecs': '♟️',
+      'informatique': '💻',
+    };
+    return emojis[clubId] ?? '🏆';
+  }
+
   String _daysUntil(Timestamp ts) {
     final diff = ts.toDate().difference(DateTime.now()).inDays;
     if (diff == 0) return "Aujourd'hui";
@@ -146,6 +182,7 @@ class _StudentHomePageState extends State<StudentHomePage> {
   }
 
   Widget _buildHeader() {
+    // BOUTON TEMPORAIRE - à supprimer après utilisation
     return Row(
       children: [
         CircleAvatar(
@@ -233,7 +270,7 @@ class _StudentHomePageState extends State<StudentHomePage> {
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text("Prochain Evenement",
+                    Text("Prochain Even.",
                         style: TextStyle(
                             fontFamily: 'Jura',
                             fontSize: 7,
@@ -279,8 +316,12 @@ class _StudentHomePageState extends State<StudentHomePage> {
       width: double.infinity,
       height: 55,
       child: ElevatedButton.icon(
-        onPressed: () {
-          // Navigation vers catalogue des clubs
+        onPressed: () async {
+          await Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => ClubsPage()),
+          );
+          _loadData(); // Recharge les données au retour
         },
         icon: const Icon(Icons.add, color: Colors.white),
         label: Text("Intégrer un club",
@@ -304,10 +345,8 @@ class _StudentHomePageState extends State<StudentHomePage> {
       ),
       child: Column(
         children: [
-          club['logoUrl'] != null && club['logoUrl'].toString().isNotEmpty
-              ? Image.network(club['logoUrl'],
-                  height: 50, width: 50, fit: BoxFit.cover)
-              : Icon(Icons.sports, size: 50, color: darkBlue),
+          Text(_getClubEmoji(club['clubid'] ?? ''),
+              style: const TextStyle(fontSize: 40)),
           const SizedBox(height: 8),
           Text(club['name'] ?? '',
               style: juraBold.copyWith(fontSize: 13, color: darkBlue),
@@ -321,7 +360,18 @@ class _StudentHomePageState extends State<StudentHomePage> {
           SizedBox(
             width: double.infinity,
             child: ElevatedButton(
-              onPressed: () {},
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => PanneauClubPage(
+                      clubId: club['clubid'] ?? '',
+                      clubName: club['name'] ?? '',
+                      clubEmoji: _getClubEmoji(club['clubid'] ?? ''),
+                    ),
+                  ),
+                );
+              },
               style: ElevatedButton.styleFrom(
                 backgroundColor: burgundy,
                 shape: RoundedRectangleBorder(
@@ -487,7 +537,13 @@ class _StudentHomePageState extends State<StudentHomePage> {
               onPressed: () {},
               icon: Icon(Icons.home_rounded, color: burgundy, size: 28)),
           IconButton(
-              onPressed: () {},
+              onPressed: () async {
+                await Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => ClubsPage()),
+                );
+                _loadData(); // Recharge les données au retour
+              },
               icon: Icon(Icons.search,
                   color: darkBlue.withOpacity(0.4), size: 26)),
           IconButton(
