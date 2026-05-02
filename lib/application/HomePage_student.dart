@@ -3,7 +3,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:eduria/application/clubs_page.dart';
 import 'package:eduria/application/panneau_club.dart';
-import 'package:eduria/application/init_admin_passwords.dart';
 
 class StudentHomePage extends StatefulWidget {
   const StudentHomePage({super.key});
@@ -25,7 +24,7 @@ class _StudentHomePageState extends State<StudentHomePage> {
   String _firstname = '';
   List<Map<String, dynamic>> _myClubs = [];
   List<Map<String, dynamic>> _events = [];
-  int _totalMembers = 0;
+  //int _totalMembers = 0;
   String? _nextEvent;
 
   @override

@@ -120,6 +120,10 @@ class _LoginPageState extends State<LoginPage> {
               controller: _emailController,
               keyboardType: TextInputType.emailAddress,
               decoration: InputDecoration(
+                labelStyle: const TextStyle(
+                  fontFamily: 'jura',
+                  color: darkBlue,
+                ),
                 hintText: 'Email',
                 hintStyle: const TextStyle(
                   fontFamily: 'jura',
@@ -146,6 +150,10 @@ class _LoginPageState extends State<LoginPage> {
               controller: _passwordController,
               obscureText: _obscureText,
               decoration: InputDecoration(
+                labelStyle: const TextStyle(
+                  fontFamily: 'jura',
+                  color: darkBlue,
+                ),
                 hintText: 'Password',
                 hintStyle: const TextStyle(
                   fontFamily: 'jura',
