@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:eduria/application/notification_service.dart';
 import 'package:eduria/application/clubs_page.dart';
 import 'package:eduria/application/panneau_club.dart';
 
@@ -281,6 +282,12 @@ class _AdminHomePageState extends State<AdminHomePage> {
             ),
             ElevatedButton(
               onPressed: () async {
+                await NotificationService.sendNotificationToClub(
+                  clubId: _adminClubId,
+                  title: "📅 Nouvel évènement",
+                  body:
+                      "${titleController.text.trim()} le ${selectedDate!.day}/${selectedDate!.month}/${selectedDate!.year}",
+                );
                 if (titleController.text.isEmpty || selectedDate == null)
                   return;
                 final docRef = _db.collection('events').doc();
@@ -308,6 +315,7 @@ class _AdminHomePageState extends State<AdminHomePage> {
         ),
       ),
     );
+    // Envoyer notification aux membres
   }
 
   void _showMembersList() async {
@@ -676,7 +684,7 @@ class _AdminHomePageState extends State<AdminHomePage> {
                             color: darkBlue.withOpacity(0.5))),
                     Text(_nextEvent ?? "Aucun",
                         style:
-                            juraBold.copyWith(fontSize: 12, color: burgundy)),
+                            juraBold.copyWith(fontSize: 10, color: burgundy)),
                   ],
                 ),
               ],

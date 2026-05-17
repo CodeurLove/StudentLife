@@ -3,12 +3,18 @@ import 'package:eduria/splash.dart';
 import 'package:flutter_locales/flutter_locales.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
+import 'package:eduria/application/notification_service.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
+
+  // Initialiser les notifications
+  await NotificationService.init();
+
   await Locales.init(
     ['fr', 'en', 'es', 'de', 'it', 'pt', 'zh', 'ja', 'ko', 'ru', 'ar'],
   );
